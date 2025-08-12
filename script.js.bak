@@ -2,7 +2,6 @@ class ImageGallery {
     constructor() {
         this.images = [];
         this.currentSlide = 0;
-        this.modalCurrentSlide = 0;
         this.autoPlayInterval = null;
         this.initializeElements();
         this.init();
@@ -31,7 +30,7 @@ class ImageGallery {
 
             this.hideLoading();
             this.renderCarousel();
-            this.showCarousel();
+            this.showCarousel(); // Make sure carousel is visible
             this.startAutoPlay();
         } catch (err) {
             console.error("Failed to load teams.json", err);
@@ -49,7 +48,7 @@ class ImageGallery {
         this.prevBtn = document.getElementById('prevBtn');
         this.nextBtn = document.getElementById('nextBtn');
 
-        // Modal elements
+        // Modal
         this.imageModal = document.getElementById('imageModal');
         this.modalImage = document.getElementById('modalImage');
         this.modalFilename = document.getElementById('modalFilename');
@@ -57,6 +56,8 @@ class ImageGallery {
         this.closeModal = document.getElementById('closeModal');
         this.downloadBtn = document.getElementById('downloadBtn');
         this.copyBtn = document.getElementById('copyBtn');
+
+        // Modal navigation buttons
         this.modalPrevBtn = document.getElementById('modalPrevBtn');
         this.modalNextBtn = document.getElementById('modalNextBtn');
 
@@ -85,6 +86,8 @@ class ImageGallery {
         this.imageModal.addEventListener('click', (e) => {
             if (e.target === this.imageModal) this.closeImagePreview();
         });
+
+        // Modal navigation
         this.modalPrevBtn.addEventListener('click', () => this.modalPreviousImage());
         this.modalNextBtn.addEventListener('click', () => this.modalNextImage());
 
@@ -99,7 +102,7 @@ class ImageGallery {
             if (e.target === this.votingModal) this.closeVotingForm();
         });
 
-        // Share functionality
+        // Share form
         this.shareBtn.addEventListener('click', () => this.openShareForm());
         this.closeShare.addEventListener('click', () => this.closeShareForm());
         this.shareModal.addEventListener('click', (e) => {
@@ -112,10 +115,11 @@ class ImageGallery {
         if (this.imageModal.classList.contains('active')) {
             if (e.key === 'Escape') {
                 this.closeImagePreview();
-                return;
+            } else if (e.key === 'ArrowLeft') {
+                this.modalPreviousImage();
+            } else if (e.key === 'ArrowRight') {
+                this.modalNextImage();
             }
-            if (e.key === 'ArrowLeft') this.modalPreviousImage();
-            if (e.key === 'ArrowRight') this.modalNextImage();
             return;
         }
 
@@ -127,6 +131,7 @@ class ImageGallery {
             return;
         }
 
+        // Natural cycling without focus constraints
         if (e.key === 'ArrowLeft') this.previousSlide();
         if (e.key === 'ArrowRight') this.nextSlide();
     }
@@ -213,19 +218,20 @@ class ImageGallery {
         this.resetAutoPlay();
     }
 
-    // Modal navigation methods
     modalNextImage() {
-        this.modalCurrentSlide = (this.modalCurrentSlide + 1) % this.images.length;
+        this.currentSlide = (this.currentSlide + 1) % this.images.length;
         this.updateModalImage();
+        this.updateCarousel();
     }
 
     modalPreviousImage() {
-        this.modalCurrentSlide = (this.modalCurrentSlide - 1 + this.images.length) % this.images.length;
+        this.currentSlide = (this.currentSlide - 1 + this.images.length) % this.images.length;
         this.updateModalImage();
+        this.updateCarousel();
     }
 
     updateModalImage() {
-        const img = this.images[this.modalCurrentSlide];
+        const img = this.images[this.currentSlide];
         this.modalFilename.textContent = img.teamName || img.filename;
         this.modalImage.classList.remove('loaded');
         this.previewLoading.style.display = 'block';
@@ -261,7 +267,7 @@ class ImageGallery {
     }
 
     openImagePreview(i) {
-        this.modalCurrentSlide = i;
+        this.currentSlide = i;
         this.updateModalImage();
         this.imageModal.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -286,13 +292,26 @@ class ImageGallery {
         this.startAutoPlay();
     }
 
-    openShareForm() {
-        // Set current URL
-        this.shareUrl.value = window.location.href;
+    async openShareForm() {
+        const currentUrl = window.location.href;
+        this.shareUrl.value = currentUrl;
         
         // Generate QR code
-        this.generateQRCode(window.location.href);
-        
+        try {
+            this.qrCode.innerHTML = '';
+            await QRCode.toCanvas(this.qrCode, currentUrl, {
+                width: 200,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff'
+                }
+            });
+        } catch (err) {
+            console.error('Error generating QR code:', err);
+            this.qrCode.innerHTML = '<p>Error generating QR code</p>';
+        }
+
         this.shareModal.classList.add('active');
         document.body.style.overflow = 'hidden';
         this.pauseAutoPlay();
@@ -304,41 +323,25 @@ class ImageGallery {
         this.startAutoPlay();
     }
 
-    generateQRCode(url) {
-        this.qrCode.innerHTML = '';
-        
-        try {
-            const qr = qrcode(0, 'M');
-            qr.addData(url);
-            qr.make();
-            
-            const qrElement = document.createElement('div');
-            qrElement.innerHTML = qr.createImgTag(4);
-            this.qrCode.appendChild(qrElement);
-        } catch (error) {
-            console.error('Error generating QR code:', error);
-            this.qrCode.innerHTML = '<p>QR code generation failed</p>';
-        }
-    }
-
     async copyUrl() {
         try {
             await navigator.clipboard.writeText(this.shareUrl.value);
+            // Temporarily change button text to show success
+            const originalText = this.copyUrlBtn.textContent;
             this.copyUrlBtn.textContent = 'Copied!';
             setTimeout(() => {
-                this.copyUrlBtn.textContent = 'Copy';
+                this.copyUrlBtn.textContent = originalText;
             }, 2000);
         } catch (err) {
             console.error('Failed to copy URL:', err);
-            this.copyUrlBtn.textContent = 'Failed';
-            setTimeout(() => {
-                this.copyUrlBtn.textContent = 'Copy';
-            }, 2000);
+            // Fallback: select the text
+            this.shareUrl.select();
+            this.shareUrl.setSelectionRange(0, 99999); // For mobile devices
         }
     }
 
     downloadImage() {
-        const img = this.images[this.modalCurrentSlide];
+        const img = this.images[this.currentSlide];
         const a = document.createElement('a');
         a.href = img.src;
         a.download = img.filename;
@@ -348,7 +351,7 @@ class ImageGallery {
     }
 
     async copyImage() {
-        const img = this.images[this.modalCurrentSlide];
+        const img = this.images[this.currentSlide];
         try {
             if (navigator.clipboard && window.ClipboardItem) {
                 const res = await fetch(img.src);
@@ -361,6 +364,7 @@ class ImageGallery {
             }
         } catch (err) {
             console.error('Copy failed', err);
+            // Fallback: copy URL to clipboard
             try {
                 await navigator.clipboard.writeText(img.src);
                 console.log('Image URL copied as fallback');

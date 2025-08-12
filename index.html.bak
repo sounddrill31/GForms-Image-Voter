@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery - Team Submissions</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>GALLERY<span class="superscript">v1.0</span></h1>
+            <button class="voting-btn" id="votingBtn">Open Voting Form</button>
+        </header>
+
+        <main class="main-content">
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>SCANNING FOR IMAGES...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="error-state" style="display: none;">
+                <p>NO IMAGES FOUND</p>
+                <small>Place images in folders under ./images/ directory</small>
+            </div>
+
+            <!-- Stacked Carousel Container -->
+            <div class="carousel-container" id="carouselContainer">
+                <div class="carousel-track" id="carousel"></div>
+                
+                <button class="carousel-btn prev" id="prevBtn">‹</button>
+                <button class="carousel-btn next" id="nextBtn">›</button>
+            </div>
+
+            <!-- Carousel Dots -->
+            <div class="carousel-dots" id="carouselDots"></div>
+        </main>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeModal">×</button>
+
+            <div class="image-container">
+                <div class="preview-loading" id="previewLoading">
+                    <div class="loading-spinner"></div>
+                </div>
+                <img id="modalImage" alt="Preview">
+            </div>
+
+            <div class="image-info">
+                <div class="filename" id="modalFilename">filename.jpg</div>
+                <div class="action-buttons">
+                    <button class="action-btn" id="downloadBtn">Download</button>
+                    <button class="action-btn" id="copyBtn">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voting Modal -->
+    <div class="modal" id="votingModal">
+        <div class="modal-content voting-content">
+            <button class="close-btn" id="closeVoting">×</button>
+            <iframe id="votingFrame" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" 
+                    allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

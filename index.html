@@ -3,74 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Gallery - Team Submissions</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Team Gallery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1>GALLERY<span class="superscript">v1.0</span></h1>
-            <button class="voting-btn" id="votingBtn">Open Voting Form</button>
+            <h1>Team Gallery<span class="superscript">2025</span></h1>
+            <div class="header-buttons">
+                <button id="shareBtn" class="share-btn" title="Share">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 16.08C17.24 16.08 16.56 16.38 16.04 16.85L8.91 12.7C8.96 12.47 9 12.24 9 12C9 11.76 8.96 11.53 8.91 11.3L15.96 7.19C16.5 7.69 17.21 8 18 8C19.66 8 21 6.66 21 5C21 3.34 19.66 2 18 2C16.34 2 15 3.34 15 5C15 5.24 15.04 5.47 15.09 5.7L8.04 9.81C7.5 9.31 6.79 9 6 9C4.34 9 3 10.34 3 12C3 13.66 4.34 15 6 15C6.79 15 7.5 14.69 8.04 14.19L15.16 18.34C15.11 18.55 15.08 18.77 15.08 19C15.08 20.61 16.39 21.92 18 21.92C19.61 21.92 20.92 20.61 20.92 19C20.92 17.39 19.61 16.08 18 16.08Z" fill="currentColor"/>
+                    </svg>
+                </button>
+                <button id="votingBtn" class="voting-btn">Open Voting Form</button>
+            </div>
         </header>
 
         <main class="main-content">
             <!-- Loading State -->
             <div id="loadingState" class="loading-state">
                 <div class="loading-spinner"></div>
-                <p>SCANNING FOR IMAGES...</p>
+                <p>Loading team data...</p>
             </div>
 
             <!-- Error State -->
             <div id="errorState" class="error-state" style="display: none;">
-                <p>NO IMAGES FOUND</p>
-                <small>Place images in folders under ./images/ directory</small>
+                <p>Error loading team data</p>
+                <small>Please check the console for details</small>
             </div>
 
-            <!-- Stacked Carousel Container -->
-            <div class="carousel-container" id="carouselContainer">
-                <div class="carousel-track" id="carousel"></div>
-                
-                <button class="carousel-btn prev" id="prevBtn">‹</button>
-                <button class="carousel-btn next" id="nextBtn">›</button>
+            <!-- Carousel Container -->
+            <div id="carouselContainer" class="carousel-container" style="display: none;">
+                <div id="carousel" class="carousel-track"></div>
+                <button id="prevBtn" class="carousel-btn prev" aria-label="Previous image">‹</button>
+                <button id="nextBtn" class="carousel-btn next" aria-label="Next image">›</button>
             </div>
 
             <!-- Carousel Dots -->
-            <div class="carousel-dots" id="carouselDots"></div>
+            <div id="carouselDots" class="carousel-dots" style="display: none;"></div>
         </main>
     </div>
 
-    <!-- Image Preview Modal -->
-    <div class="modal" id="imageModal">
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
         <div class="modal-content">
-            <button class="close-btn" id="closeModal">×</button>
-
+            <button id="closeModal" class="close-btn">×</button>
+            <button id="modalPrevBtn" class="modal-carousel-btn prev" aria-label="Previous image">‹</button>
+            <button id="modalNextBtn" class="modal-carousel-btn next" aria-label="Next image">›</button>
             <div class="image-container">
-                <div class="preview-loading" id="previewLoading">
+                <div id="previewLoading" class="preview-loading">
                     <div class="loading-spinner"></div>
                 </div>
-                <img id="modalImage" alt="Preview">
+                <img id="modalImage" alt="Team preview">
             </div>
-
             <div class="image-info">
-                <div class="filename" id="modalFilename">filename.jpg</div>
+                <div class="filename" id="modalFilename"></div>
                 <div class="action-buttons">
-                    <button class="action-btn" id="downloadBtn">Download</button>
-                    <button class="action-btn" id="copyBtn">Copy</button>
+                    <button id="downloadBtn" class="action-btn">Download</button>
+                    <button id="copyBtn" class="action-btn">Copy</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Voting Modal -->
-    <div class="modal" id="votingModal">
+    <div id="votingModal" class="modal">
         <div class="modal-content voting-content">
-            <button class="close-btn" id="closeVoting">×</button>
-            <iframe id="votingFrame" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" 
-                    allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <button id="closeVoting" class="close-btn">×</button>
+            <iframe id="votingFrame" src="https://docs.google.com/forms/d/e/1FAIpQLSdkjSDJksDJSK/viewform?embedded=true"></iframe>
         </div>
     </div>
 
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content share-content">
+            <button id="closeShare" class="close-btn">×</button>
+            <div class="share-container">
+                <h2>Share This Gallery</h2>
+                <div class="url-container">
+                    <label for="shareUrl">Website URL:</label>
+                    <div class="url-input-group">
+                        <input type="text" id="shareUrl" readonly>
+                        <button id="copyUrlBtn" class="action-btn">Copy URL</button>
+                    </div>
+                </div>
+                <div class="qr-container">
+                    <p>Scan QR Code:</p>
+                    <div id="qrCode" class="qr-code"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
