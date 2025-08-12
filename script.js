@@ -351,16 +351,18 @@ class ImageGallery {
     }
 
     generateQRCode(url) {
-        this.qrCode.innerHTML = '';
-        
+        this.qrCode.innerHTML = ''; // Clear previous QR code
+    
         try {
-            const qr = qrcode(0, 'M');
-            qr.addData(url);
-            qr.make();
-            
-            const qrElement = document.createElement('div');
-            qrElement.innerHTML = qr.createImgTag(4);
-            this.qrCode.appendChild(qrElement);
+            // Create a new QRCode instance: this creates and appends the QR code automatically
+            new QRCode(this.qrCode, {
+                text: url,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
         } catch (error) {
             console.error('Error generating QR code:', error);
             this.qrCode.innerHTML = '<p>QR code generation failed</p>';
