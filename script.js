@@ -3,6 +3,7 @@ class ImageGallery {
         this.images = [];
         this.currentSlide = 0;
         this.modalCurrentSlide = 0;
+        this.imageTransforms = new Map(); // Track image transformations
         this.autoPlayInterval = null;
         this.initializeElements();
         this.init();
@@ -59,6 +60,8 @@ class ImageGallery {
         this.copyBtn = document.getElementById('copyBtn');
         this.modalPrevBtn = document.getElementById('modalPrevBtn');
         this.modalNextBtn = document.getElementById('modalNextBtn');
+        this.flipLeftBtn = document.getElementById('flipLeftBtn');
+        this.flipRightBtn = document.getElementById('flipRightBtn');
 
         // Voting modal
         this.votingModal = document.getElementById('votingModal');
@@ -88,7 +91,9 @@ class ImageGallery {
         this.modalPrevBtn.addEventListener('click', () => this.modalPreviousImage());
         this.modalNextBtn.addEventListener('click', () => this.modalNextImage());
 
-        // Image actions
+        // Image controls
+        this.flipLeftBtn.addEventListener('click', () => this.flipImageLeft());
+        this.flipRightBtn.addEventListener('click', () => this.flipImageRight());
         this.downloadBtn.addEventListener('click', () => this.downloadImage());
         this.copyBtn.addEventListener('click', () => this.copyImage());
 
@@ -116,6 +121,8 @@ class ImageGallery {
             }
             if (e.key === 'ArrowLeft') this.modalPreviousImage();
             if (e.key === 'ArrowRight') this.modalNextImage();
+            if (e.key === 'f' || e.key === 'F') this.flipImageLeft();
+            if (e.key === 'g' || e.key === 'G') this.flipImageRight();
             return;
         }
 
@@ -230,6 +237,9 @@ class ImageGallery {
         this.modalImage.classList.remove('loaded');
         this.previewLoading.style.display = 'block';
 
+        // Reset image transforms when changing images
+        this.resetImageTransform();
+
         const hiRes = new Image();
         hiRes.onload = () => {
             this.modalImage.src = img.src;
@@ -241,6 +251,42 @@ class ImageGallery {
             this.modalImage.alt = 'Failed to load image';
         };
         hiRes.src = img.src;
+    }
+
+    // Image flip controls
+    resetImageTransform() {
+        this.modalImage.style.transform = '';
+    }
+
+    flipImageLeft() {
+      const imageKey = this.modalCurrentSlide;
+      const t = this.imageTransforms.get(imageKey) || { scaleX: 1, scaleY: 1, rotate: 0 };
+      t.rotate = (t.rotate - 90) % 360;
+      this.imageTransforms.set(imageKey, t);
+      this.applyImageTransform();
+    }
+
+
+    flipImageRight() {
+      const imageKey = this.modalCurrentSlide;
+      const t = this.imageTransforms.get(imageKey) || { scaleX: 1, scaleY: 1, rotate: 0 };
+      t.rotate = (t.rotate + 90) % 360;
+      this.imageTransforms.set(imageKey, t);
+      this.applyImageTransform();
+    }
+
+    applyImageTransform() {
+      const imageKey = this.modalCurrentSlide;
+      const t = this.imageTransforms.get(imageKey) || { scaleX: 1, scaleY: 1, rotate: 0 };
+    
+      const { scaleX = 1, scaleY = 1, rotate = 0 } = t;
+    
+      // Apply rotation and scale; order matters: functions are applied right-to-left.
+      // Using "rotate(...) scale(...)" is standard for images.
+      this.modalImage.style.transform = `rotate(${rotate}deg) scale(${scaleX}, ${scaleY})`;
+    
+      // Keep rotation around the visual center to avoid unexpected shifts
+      this.modalImage.style.transformOrigin = 'center center';
     }
 
     startAutoPlay() {
