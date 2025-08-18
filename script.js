@@ -76,6 +76,12 @@ class ImageGallery {
         this.copyUrlBtn = document.getElementById('copyUrlBtn');
         this.qrCode = document.getElementById('qrCode');
 
+        // New elements for additional features
+        this.votingBtn2 = document.getElementById('votingBtn2');
+        this.liveResultsBtn = document.getElementById('liveResultsBtn');
+        this.liveResultsModal = document.getElementById('liveResultsModal');
+        this.closeLiveResults = document.getElementById('closeLiveResults');
+
         // Event listeners
         this.prevBtn.addEventListener('click', () => this.previousSlide());
         this.nextBtn.addEventListener('click', () => this.nextSlide());
@@ -111,6 +117,14 @@ class ImageGallery {
             if (e.target === this.shareModal) this.closeShareForm();
         });
         this.copyUrlBtn.addEventListener('click', () => this.copyUrl());
+
+        // New event listeners for new buttons/modals
+        this.votingBtn2.addEventListener('click', () => this.openVotingForm());
+        this.liveResultsBtn.addEventListener('click', () => this.openLiveResults());
+        this.closeLiveResults.addEventListener('click', () => this.closeLiveResultsForm());
+        this.liveResultsModal.addEventListener('click', (e) => {
+            if (e.target === this.liveResultsModal) this.closeLiveResultsForm();
+        });
     }
 
     keyHandler(e) {
@@ -346,6 +360,18 @@ class ImageGallery {
 
     closeShareForm() {
         this.shareModal.classList.remove('active');
+        document.body.style.overflow = '';
+        this.startAutoPlay();
+    }
+
+    openLiveResults() {
+        this.liveResultsModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        this.pauseAutoPlay();
+    }
+
+    closeLiveResultsForm() {
+        this.liveResultsModal.classList.remove('active');
         document.body.style.overflow = '';
         this.startAutoPlay();
     }

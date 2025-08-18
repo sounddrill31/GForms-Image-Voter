@@ -44,8 +44,17 @@
                 <button id="nextBtn" class="carousel-btn next">›</button>
             </div>
 
+                        <!-- Voter Buttons (Mono scheme, flex, easy to center if needed) -->
+            <div class="voter-buttons" style="display: flex; justify-content: center; gap: 1rem; margin-top: 2rem;">
+                <!-- To center, add: justify-content: center; (hidden flag can be toggled here) -->
+                <button id="votingBtn2" class="voting-btn">Vote Now!</button>
+                <button id="liveResultsBtn" class="voting-btn">See Live Results!</button>
+            </div>
+
+
             <!-- Carousel Dots -->
             <div id="carouselDots" class="carousel-dots" style="display: none;"></div>
+
         </main>
     </div>
 
@@ -91,7 +100,15 @@
     <div id="votingModal" class="modal">
         <div class="modal-content voting-content">
             <button id="closeVoting" class="close-btn">×</button>
-            <iframe id="votingFrame" src="https://docs.google.com/forms/d/e/1FAIpQLSdaQfmVLWHw4ZYXBZ4M_aDYU4NvvyHWvrNCFBvGoQ6LNGbWRg/viewform?embedded=true"></iframe>
+            <iframe id="votingFrame" src="https://google.com/viewform?embedded=true"></iframe>
+        </div>
+    </div>
+
+    <!-- Live Results Modal (Mono scheme, same as voting modal) -->
+    <div id="liveResultsModal" class="modal">
+        <div class="modal-content voting-content">
+            <button id="closeLiveResults" class="close-btn">×</button>
+            <iframe id="liveResultsFrame" src="https://google.com/viewanalytics"></iframe>
         </div>
     </div>
 
