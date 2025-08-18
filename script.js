@@ -335,9 +335,24 @@ class ImageGallery {
     }
 
     openVotingForm() {
-        this.votingModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        this.pauseAutoPlay();
+        const formUrl = 'https://google.com/viewform';
+        const popup = window.open(formUrl, 'googleform', 'width=800,height=600,scrollbars=yes');
+        const checkClosed = setInterval(() => {
+            if (popup.closed) {
+                clearInterval(checkClosed);
+                this.showThankYouMessage();
+            }
+        }, 1000);
+    }
+
+    showThankYouMessage() {
+        const msg = document.getElementById('thankYouMessage');
+        if (msg) {
+            msg.style.display = 'block';
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 4000);
+        }
     }
 
     closeVotingForm() {
@@ -365,9 +380,15 @@ class ImageGallery {
     }
 
     openLiveResults() {
-        this.liveResultsModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        this.pauseAutoPlay();
+        const resultsUrl = 'https://google.com/viewanalytics';
+        const popup = window.open(resultsUrl, 'liveresults', 'width=800,height=600,scrollbars=yes');
+        const checkClosed = setInterval(() => {
+            if (popup.closed) {
+                clearInterval(checkClosed);
+                console.log('Live results popup closed - user returned');
+                // Optional: handle return logic here
+            }
+        }, 1000);
     }
 
     closeLiveResultsForm() {
